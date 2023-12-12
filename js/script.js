@@ -1,123 +1,216 @@
-const player = function(name) {
-  let succeed = false;
+function player(name) {
   const setName = () => {
-    name = prompt('Enter your name');
+    name = prompt('Enter your name.');
   };
-  const getName = () => {
-    return name;
-  }
+
+  const getName = () => name;
 
   return {
     setName,
-    getName,
-    succeed
+    getName
   }
 }
 
-const gameBoard = (function() {
-  let board = new Array(9).fill(' ');
+function gameBoard() {
+  const rows = 3;
+  const columns = 3;
+  let board = [];
 
-  const setMark = (mark, position) => {
-    board[position] = mark;
-  };
-  const isPositionFree = (position) => {
-    if (board[position] == ' ') {
-      return true;
-    } else {
-      return false;
+  for (let i = 0; i < rows; i++) {
+    board[i] = [];
+    for (let j = 0; j < columns; j++) {
+      board[i].push(cell());
     }
-  };
-  const render = () => {
-    console.log(board);
-  };
-  const getRows = () => {
-    const horizontal = board.join('');
-    const vertical = board[0] + board[3] + board[6] + board[1] + board[4] + board[7] + board[2] + board[5] + board[8];
-    const diagonal = board[0] + board[4] + board[8] + board[2] + board[4] + board[6];
+  }
 
-    return { horizontal, vertical, diagonal };
+  const getBoard = () => board;
+
+  const setMark = (row, column, player) => {
+    board[row][column].addMark(player);
   };
-  const reset = () => {
-    board.fill(' ');
+
+  const printBoard = () => {
+    const boardWithCellValues = board.map(row => row.map(cell => cell.getValue()));
+    console.table(boardWithCellValues);
   };
+
+  const resetBoard = () => {
+    board.map(row => row.map(cell => cell.addMark('')));
+  }
 
   return {
+    getBoard,
     setMark,
-    isPositionFree,
-    getRows,
-    render,
-    reset
+    printBoard,
+    resetBoard
+  }
+};
+
+function cell() {
+  let value = '';
+
+  const addMark = (player) => {
+    value = player;
+  };
+
+  const getValue = () => value;
+
+  return {
+    addMark,
+    getValue
+  };
+}
+
+const game = (function () {
+  let board = gameBoard();
+
+  const player1 = player('Player 1');
+  const player2 = player('Player 2');
+  player1.mark = 'x';
+  player2.mark = 'o';
+
+  const players = [player1, player2];
+
+  let activePlayer = players[0];
+  let succeed;
+  let turnCount = 0;
+
+  const switchPlayerTurn = () => {
+    activePlayer = activePlayer === players[0] ? players[1] : players[0];
+  };
+
+  const getActivePlayer = () => activePlayer;
+
+  const printNewRound = () => {
+    board.printBoard();
+    console.log(`${getActivePlayer().getName()}'s turn.`);
+  };
+
+  const isSpaceNotFree = (row, column) => {
+    const value = board.getBoard()[row][column].getValue();
+    return value !== '';
+  };
+
+  const isPlayerSucceed = (player) => {
+    if (board.getBoard()[0][0].getValue() == player.mark
+      && board.getBoard()[0][1].getValue() == player.mark
+      && board.getBoard()[0][2].getValue() == player.mark
+      || board.getBoard()[1][0].getValue() == player.mark
+      && board.getBoard()[1][1].getValue() == player.mark
+      && board.getBoard()[1][2].getValue() == player.mark
+      || board.getBoard()[2][0].getValue() == player.mark
+      && board.getBoard()[2][1].getValue() == player.mark
+      && board.getBoard()[2][2].getValue() == player.mark) {
+      return true;
+    } else if (board.getBoard()[0][0].getValue() == player.mark
+      && board.getBoard()[1][0].getValue() == player.mark
+      && board.getBoard()[2][0].getValue() == player.mark
+      || board.getBoard()[0][1].getValue() == player.mark
+      && board.getBoard()[1][1].getValue() == player.mark
+      && board.getBoard()[2][1].getValue() == player.mark
+      || board.getBoard()[0][2].getValue() == player.mark
+      && board.getBoard()[1][2].getValue() == player.mark
+      && board.getBoard()[2][2].getValue() == player.mark) {
+      return true;
+    } else if (board.getBoard()[0][0].getValue() == player.mark
+      && board.getBoard()[1][1].getValue() == player.mark
+      && board.getBoard()[2][2].getValue() == player.mark
+      || board.getBoard()[0][2].getValue() == player.mark
+      && board.getBoard()[1][1].getValue() == player.mark
+      && board.getBoard()[2][0].getValue() == player.mark) {
+      return true;
+    }
+    return false;
+  };
+
+  const playRound = (row, column) => {
+    if (succeed || turnCount == 9) {
+      console.log('Game Over');
+      return;
+    };
+    if (isSpaceNotFree(row, column)) {
+      printNewRound();
+      return;
+    }
+
+    board.setMark(row, column, getActivePlayer().mark);
+
+    succeed = isPlayerSucceed(getActivePlayer());
+    if (succeed) return;
+
+    turnCount++;
+    switchPlayerTurn();
+    printNewRound();
+  };
+
+  const getWinner = () => {
+    if (succeed) return `${getActivePlayer().getName()} WINS`;
+    if (turnCount == 9) return 'A Tie!';
+  };
+
+  const resetBoard = () => {
+    board.resetBoard();
+    turnCount = 0;
+    activePlayer = players[0];
+    succeed = null;
+  }
+
+  printNewRound();
+
+  return {
+    playRound,
+    getActivePlayer,
+    getBoard: board.getBoard,
+    getWinner,
+    resetBoard
   }
 })();
 
-const game = (function() {
-  let player1 = player('Player 1');
-  let player2 = player('Player 2');
-  let mark = 'x';
-  let position;
-  let turnCount = 0;
+const screen = (function () {
+  const playerTurnDiv = document.querySelector('.turn');
+  const boardDiv = document.querySelector('.board');
+  const resetButton = document.querySelector('.reset');
 
-  const toggleMark = () => {
-    if (mark == 'x') {
-      mark = 'o';
-    } else {
-      mark = 'x';
-    }
-  };
-  const isGameOver = () => {
-    if (player1.succeed || player2.succeed) {
-      return true;
-    } else {
-      return false;
-    }
-  };
-  const checkWinner = () => {
-    const rows = gameBoard.getRows();
-    for (let row in rows) {
-      if (rows[row].includes('xxx')) player1.succeed = true;
-      if (rows[row].includes('ooo')) player2.succeed = true;
-    }
-  };
-  const getResult = () => {
-    if (player1.succeed && player2.succeed) {
-      console.log('A Tie');
-    } else if (player1.succeed) {
-      console.log(`${player1.getName()} is a WINNER`);
-    } else if (player2.succeed) {
-      console.log(`${player2.getName()} is a WINNER`);
-    }
-  };
-  const play = () => {
-    if (!isGameOver()) {
-      position = prompt('Place your mark');
-      if (gameBoard.isPositionFree(position)) {
-        gameBoard.setMark(mark, position);
-        toggleMark();
-        turnCount++;
-        gameBoard.render();
-        if (turnCount % 2 == 0) {
-          checkWinner();
-          getResult();
-        }
-      } else {
-        alert('This space is already marked');
-        play();
-      }
-    }
-  };
-  const reset = () => {
-    player1.succeed = false;
-    player2.succeed = false;
-    turnCount = 0;
-    mark = 'x';
-    gameBoard.reset();
-    gameBoard.render();
+  const updateScreen = () => {
+    boardDiv.textContent = '';
+
+
+    const board = game.getBoard();
+    const activePlayer = game.getActivePlayer();
+
+    playerTurnDiv.textContent = game.getWinner()||`${activePlayer.getName()}'s turn...`;
+
+    board.forEach((row, rowIndex) => {
+      row.forEach((cell, cellIndex) => {
+        const cellButton = document.createElement('button');
+        cellButton.classList.add('cell');
+
+        cellButton.dataset.index = '' + rowIndex + cellIndex;
+        cellButton.textContent = cell.getValue();
+        boardDiv.appendChild(cellButton);
+      })
+    });
   };
 
-  return {
-    player1,
-    player2,
-    play,
-    reset
+  function clickHandlerBoard(e) {
+    const selectedCell = e.target.dataset.index;
+
+    if (!selectedCell) return;
+
+    const row = selectedCell[0];
+    const column = selectedCell[1];
+
+    game.playRound(row, column);
+    updateScreen();
   }
+
+  function clickHandlerReset() {
+    game.resetBoard();
+    updateScreen();
+  }
+
+  boardDiv.addEventListener('click', clickHandlerBoard);
+  resetButton.addEventListener('click', clickHandlerReset);
+
+  updateScreen();
 })();
