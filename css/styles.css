@@ -1,21 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&family=Permanent+Marker&display=swap');
+
 *,
 *::before,
 *::after {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+  font-family: 'Chakra Petch', sans-serif;
 }
 
 body {
   min-height: 100vh;
   display: grid;
   grid-template-rows: auto 1fr auto;
+  background-color: burlywood;
 }
 
 .header,
 .footer {
   text-align: center;
   padding: 16px;
+  background-color: brown;
+  color: white;
 }
 
 .main {
@@ -23,18 +29,137 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  font-size: 18px;
+  color: brown;
 }
 
 .main .board {
-  width: 400px;
-  height: 400px;
+  box-sizing: content-box;
+  width: 350px;
+  height: 350px;
   display: grid;
   grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr;
+  background-color: darkgreen;
+  border: 24px solid brown;
+  outline: 4px solid goldenrod;
+  margin: 24px;
+  position: relative;
+}
+
+.main .board::before,
+.main .board::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: transparent;
+  pointer-events: none;
+}
+
+.main .board::before {
+  width: 117px;
+  height: 320px;
+  border-right: 2px solid white;
+  border-left: 2px solid white;
+}
+
+.main .board::after {
+  width: 320px;
+  height: 117px;
+  border-top: 2px solid white;
+  border-bottom: 2px solid white;
 }
 
 .main .board .cell {
-  border: 1px solid black;
+  font-family: 'Permanent Marker', cursive;
+  font-size: 48px;
+  border: none;
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: transparent;
+  color: white;
+}
+
+.main .reset {
+  padding: 4px 16px;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  background-color: darkgreen;
+  box-shadow: 1px 2px 0px goldenrod, 2px 3px 1px brown;
+}
+
+.main .reset:hover,
+.dialog #submit:hover {
+  transform: scale(1.25);
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+.footer a {
+  color: white;
+}
+
+.dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  background-color: darkgreen;
+  border: 12px solid brown;
+}
+
+.dialog::backdrop {
+  backdrop-filter: blur(3px);
+}
+
+.dialog .form {
+  width: 600px;
+  height: 400px;
+  font-size: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+}
+
+.dialog .form .wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 150px;
+  gap: 32px;
+}
+
+.dialog .form .item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.dialog .form input {
+  border: none;
+  background-color: lightgoldenrodyellow;
+  padding: 4px 8px;
+
+  &::placeholder {
+    font-style: italic;
+  };
+}
+
+.dialog .form #submit {
+  padding: 4px 16px;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  background-color: brown;
+  box-shadow: 1px 2px 0px burlywood, 2px 3px 1px goldenrod;
 }

@@ -1,6 +1,6 @@
 function player(name) {
-  const setName = () => {
-    name = prompt('Enter your name.');
+  const setName = (input) => {
+    name = input;
   };
 
   const getName = () => name;
@@ -162,7 +162,9 @@ const game = (function () {
     getActivePlayer,
     getBoard: board.getBoard,
     getWinner,
-    resetBoard
+    resetBoard,
+    setFirstPlayerName: player1.setName,
+    setSecondPlayerName: player2.setName
   }
 })();
 
@@ -170,6 +172,10 @@ const screen = (function () {
   const playerTurnDiv = document.querySelector('.turn');
   const boardDiv = document.querySelector('.board');
   const resetButton = document.querySelector('.reset');
+  const dialog = document.querySelector('.dialog');
+  const submitButton = document.querySelector('dialog #submit');
+  const firstPlayerName = document.querySelector('#first-player');
+  const secondPlayerName = document.querySelector('#second-player');
 
   const updateScreen = () => {
     boardDiv.textContent = '';
@@ -209,8 +215,19 @@ const screen = (function () {
     updateScreen();
   }
 
+  function clickHandlerSubmit(e) {
+    e.preventDefault();
+    game.setFirstPlayerName(firstPlayerName.value||'Player 1');
+    game.setSecondPlayerName(secondPlayerName.value||'Player 2');
+    updateScreen();
+    dialog.close();
+  }
+
   boardDiv.addEventListener('click', clickHandlerBoard);
   resetButton.addEventListener('click', clickHandlerReset);
+  submitButton.addEventListener('click', clickHandlerSubmit);
+  
+  dialog.showModal();
 
   updateScreen();
 })();
