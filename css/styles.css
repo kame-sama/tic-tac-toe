@@ -83,7 +83,15 @@ body {
   color: white;
 }
 
-.main .reset {
+.main .buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 350px;
+}
+
+.main .reset,
+.main .edit {
+  flex: 0 1 120px;
   padding: 4px 16px;
   border: none;
   border-radius: 4px;
@@ -93,6 +101,7 @@ body {
 }
 
 .main .reset:hover,
+.main .edit:hover,
 .dialog #submit:hover {
   transform: scale(1.25);
 }

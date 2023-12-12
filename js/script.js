@@ -176,6 +176,7 @@ const screen = (function () {
   const submitButton = document.querySelector('dialog #submit');
   const firstPlayerName = document.querySelector('#first-player');
   const secondPlayerName = document.querySelector('#second-player');
+  const editButton = document.querySelector('.edit');
 
   const updateScreen = () => {
     boardDiv.textContent = '';
@@ -226,6 +227,9 @@ const screen = (function () {
   boardDiv.addEventListener('click', clickHandlerBoard);
   resetButton.addEventListener('click', clickHandlerReset);
   submitButton.addEventListener('click', clickHandlerSubmit);
+  editButton.addEventListener('click', () => {
+    dialog.showModal();
+  });
   
   dialog.showModal();
 
